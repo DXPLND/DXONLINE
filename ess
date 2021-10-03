@@ -1,0 +1,22 @@
+#!/system/bin/sh
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+GREEN='\033[1;32m'
+NC='\033[0m'
+PUK=com.tencent.ig
+log=$(find -L /sdcard/android/data/$PUK/ -name '*.log' -o -name '*.txt' -o -name '*.json')
+_PROC="$PUK:plugin $PUK:networkDetector $PUK:ping"
+while true;do
+for i in $_PROC;do
+PID=$(pidof $i)
+if [ ${#PID} -gt 0 ];then
+kill $PID
+echo "${GREEN}$PID killed${NC}"
+fi
+done
+for i in $log;do
+rm -rf $i
+echo "${GREEN}CLEAN: ${NC}$i${NC}"
+done
+sleep 10
+done
