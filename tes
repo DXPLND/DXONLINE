@@ -1,0 +1,37 @@
+IPTABLES=/system/bin/iptables;
+PORT=$(cat prt);
+for P in $PORT;do
+$IPTABLES -t nat -D OUTPUT -p tcp ! -d 1.1.1.1 --dport 53 -j DNAT --to-destination 127.0.0.1:5354;
+$IPTABLES -t nat -D OUTPUT -p udp ! -d 1.1.1.1 --dport 53 -j DNAT --to-destination 127.0.0.1:5354;
+$IPTABLES -t nat -A OUTPUT -p tcp ! -d 1.1.1.1 --dport 53 -j DNAT --to-destination 127.0.0.1:5354;
+$IPTABLES -t nat -A OUTPUT -p udp ! -d 1.1.1.1 --dport 53 -j DNAT --to-destination 127.0.0.1:5354;
+$IPTABLES --flush DX -t nat;
+$IPTABLES -X DX -t nat;
+$IPTABLES -t nat -N DX;
+$IPTABLES -t nat -A DX -d 0.0.0.0/8 -j RETURN;
+$IPTABLES -t nat -A DX -d 10.0.0.0/8 -j RETURN;
+$IPTABLES -t nat -A DX -d 127.0.0.0/8 -j RETURN;
+$IPTABLES -t nat -A DX -d 169.254.0.0/16 -j RETURN;
+$IPTABLES -t nat -A DX -d 172.16.0.0/12 -j RETURN;
+$IPTABLES -t nat -A DX -d 192.168.0.0/16 -j RETURN;
+$IPTABLES -t nat -A DX -d 224.0.0.0/4 -j RETURN;
+$IPTABLES -t nat -A DX -d 240.0.0.0/4 -j RETURN;
+$IPTABLES -t nat -A DX -p tcp -j REDIRECT --to-ports 8787;
+$IPTABLES -t nat -A DX -p udp -j REDIRECT --to-ports 8787;
+$IPTABLES -t nat -A OUTPUT -p tcp ! -d 1.1.1.1 --dport  $P -j DNAT --to-destination 127.0.0.1:5354;
+$IPTABLES -t nat -A OUTPUT -p udp ! -d 1.1.1.1 --dport  $P -j DNAT --to-destination 127.0.0.1:5354;
+$IPTABLES -A INPUT -p tcp --destination-port $P -j DROP;
+$IPTABLES -A OUTPUT -p tcp --destination-port $P -j DROP;
+$IPTABLES -A FORWARD -p tcp --destination-port $P -j DROP;
+$IPTABLES -A INPUT -p udp --destination-port $P -j DROP,
+$IPTABLES -A OUTPUT -p udp --destination-port $P -j DROP,
+$IPTABLES -A FORWARD -p udp --destination-port $P -j DROP;
+$IPTABLES -t nat -A OUTPUT -p tcp --dport $P -j DX;
+$IPTABLES -t nat -A OUTPUT -p tcp --dport $P -j DX;
+$IPTABLES -t nat -A PREROUTING -p tcp --dport $P -j DX;
+$IPTABLES -t nat -A PREROUTING -p tcp --dport $P -j DX;
+$IPTABLES -t nat -A OUTPUT -p udp --dport $P -j DX;
+$IPTABLES -t nat -A OUTPUT -p udp --dport $P -j DX;
+$IPTABLES -t nat -A PREROUTING -p udp --dport $P -j DX;
+$IPTABLES -t nat -A PREROUTING -p udp --dport $P -j DX;
+done
